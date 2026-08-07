@@ -1,39 +1,37 @@
-import { NavLink } from "react-router-dom"
+import { NavLink } from "react-router"
 import HomeSvg from "../assets/navigation/home.svg?react"
 import FaceSvg from "../assets/navigation/face-smiling.svg?react"
 import FilesSvg from "../assets/navigation/files.svg?react"
 import PaperplaneSvg from "../assets/navigation/paper-airplane.svg?react"
 import gsap from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
+import { useGSAP } from "@gsap/react"
 import "./Navigation.css"
-import { useEffect, useRef } from "react"
+import { useRef } from "react"
 
 gsap.registerPlugin(ScrollTrigger);
 
 function Header() {
-  const headerRef = useRef();
+  const headerRef = useRef(null);
 
-  useEffect(() => {
+  useGSAP(() => {
     const header = headerRef.current;
-    const tl = gsap.to(
-      header, 
-      {
-        maxWidth: "500px",
-        scrollTrigger: {
-          trigger: document.body,
-          start: "top top",
-          end: "+=1000",
-          scrub: true,
-          // markers: true
-        },
-        ease: "none"
-    })
+    if (!header) return;
 
-    return () => {
-      if (tl.scrollTrigger) tl.scrollTrigger.kill();
-      tl.kill();
-    };
-  }, [])
+    // Definicja zmiennej tween zamiast błędnego tl (to pojedynczy ruch, nie oś czasu)
+    const tween = gsap.to(header, {
+      maxWidth: "500px",
+      scrollTrigger: {
+        trigger: document.body,
+        start: "top top",
+        end: "+=1000",
+        scrub: true,
+        // markers: true
+      },
+      ease: "none"
+    });
+
+  }, { scope: headerRef });
 
   return (
     <header ref={headerRef}>
@@ -50,11 +48,13 @@ function Header() {
 
 function BottomNavbarElement({SvgComponent, text, to}) {
   return (
-    <NavLink to={to} className={"bottom-nav-element"}>
-      {({isActive}) => (<>
-        <SvgComponent style={{ height: 25, width: 25, fill: isActive ? '#fff' : '#bbb'}} />
-        <span>{text}</span>
-      </>)}
+    <NavLink to={to} className="bottom-nav-element">
+      {({isActive}) => (
+        <>
+          <SvgComponent style={{ height: 25, width: 25, fill: isActive ? '#fff' : '#bbb'}} />
+          <span>{text}</span>
+        </>
+      )}
     </NavLink>
   )
 }
@@ -73,7 +73,6 @@ function BottomNavbar() {
 }
 
 export default function Navigation() {
-
   return (
     <div>
       <Header/>

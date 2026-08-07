@@ -23,6 +23,10 @@ export default function Contact() {
       <section className="text-section">
         <h1>Contact</h1>
         <p>Feel free to reach out to me using this form!</p>
+        <p style={{fontSize: '1rem', color: "#dddddd"}}>
+          Whether it’s a collaboration, a project idea, or a technical 
+          discussion - I’m always open to meaningful conversations.
+        </p>
       </section>
       <form action={handleSubmit}>
         <div className="input-group">
