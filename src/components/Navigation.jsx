@@ -18,8 +18,7 @@ function Header() {
     const header = headerRef.current;
     if (!header) return;
 
-    // Definicja zmiennej tween zamiast błędnego tl (to pojedynczy ruch, nie oś czasu)
-    const tween = gsap.to(header, {
+    gsap.to(header, {
       maxWidth: "500px",
       scrollTrigger: {
         trigger: document.body,
