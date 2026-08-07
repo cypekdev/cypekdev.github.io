@@ -5,7 +5,7 @@ import ScrollReveal from '../components/ScrollReveal'
 import ShinyText from '../components/ShinyText'
 import StarBorder from '../components/StarBorder'
 import TextType from '../components/TextType'
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router'
 
 
 
@@ -32,7 +32,7 @@ export default function Home() {
           "> singer in the school band",
           "> enjoyer of monospace font"
         ]}
-        typingSpeed={70}
+        variableSpeed={{ min: 50, max: 100 }}
         deletingSpeed={30}
       />
       
@@ -63,7 +63,7 @@ export default function Home() {
     <div style={{height: 150}} />
   
 
-    <div style={{textAlign: "center", width: "900px", marginInline: "auto"}}>
+    <section style={{textAlign: "center", width: "900px", marginInline: "auto"}}>
       <span style={{fontSize: "1.5rem"}}>
         <ShinyText text="About me"/>
       </span>
@@ -84,9 +84,6 @@ export default function Home() {
         I work at the intersection of technology, engineering, and people, building solutions that are meant to last.
       </ScrollReveal>
 
-
-      <br />
-
       <StarBorder 
         as={Link} 
         to={{pathname: "/about"}}
@@ -98,8 +95,24 @@ export default function Home() {
 
 
 
-    </div>
+    </section>
+
+    <div style={{height: 60}} />
+
+    <section style={{textAlign: "center", width: "900px", marginInline: "auto"}}>
+      <span style={{fontSize: "1.5rem"}}>
+        <ShinyText text="Value"/>
+      </span>
+
+      <div>
+        
+      </div>
+
+
+    </section>
+
     <div style={{height: 1500}} />
+    
 
   </>)
 } 

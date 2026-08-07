@@ -1,6 +1,7 @@
-import { useEffect, useRef, useMemo } from 'react';
+import { useRef, useMemo } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useGSAP } from '@gsap/react'; // Wymaga: npm install @gsap/react
 
 import './ScrollReveal.css';
 
@@ -32,12 +33,14 @@ export default function ScrollReveal({
     });
   }, [children]);
 
-  useEffect(() => {
+  useGSAP(() => {
     const el = containerRef.current;
     if (!el) return;
+    if (scrollContainerRef && !scrollContainerRef.current) return;
 
     const scroller = scrollContainerRef && scrollContainerRef.current ? scrollContainerRef.current : window;
 
+    // 1. Animacja obrotu
     gsap.fromTo(
       el,
       { transformOrigin: '0% 50%', rotate: baseRotation },
@@ -58,10 +61,15 @@ export default function ScrollReveal({
 
     gsap.fromTo(
       wordElements,
-      { opacity: baseOpacity, willChange: 'opacity' },
+      { 
+        opacity: baseOpacity, 
+        filter: enableBlur ? `blur(${blurStrength}px)` : 'none',
+        willChange: 'opacity, filter' 
+      },
       {
         ease: 'none',
         opacity: 1,
+        filter: enableBlur ? 'blur(0px)' : 'none',
         stagger: 0.05,
         scrollTrigger: {
           trigger: el,
@@ -73,33 +81,15 @@ export default function ScrollReveal({
       }
     );
 
-    if (enableBlur) {
-      gsap.fromTo(
-        wordElements,
-        { filter: `blur(${blurStrength}px)` },
-        {
-          ease: 'none',
-          filter: 'blur(0px)',
-          stagger: 0.05,
-          scrollTrigger: {
-            trigger: el,
-            scroller,
-            start: 'top bottom-=20%',
-            end: wordAnimationEnd,
-            scrub: true
-          }
-        }
-      );
-    }
-
-    return () => {
-      ScrollTrigger.getAll().forEach(trigger => trigger.kill());
-    };
-  }, [scrollContainerRef, enableBlur, baseRotation, baseOpacity, rotationEnd, wordAnimationEnd, blurStrength]);
+  }, {
+    // Obiekt konfiguracyjny jako drugi parametr
+    dependencies: [scrollContainerRef, scrollContainerRef?.current, enableBlur, baseRotation, baseOpacity, rotationEnd, wordAnimationEnd, blurStrength],
+    scope: containerRef // Automatycznie zawęża querySelector tylko do wnętrza tego komponentu
+  });
 
   return (
     <h2 ref={containerRef} className={`scroll-reveal ${containerClassName}`}>
       <p className={textClassName}>{splitText}</p>
     </h2>
   );
-};
+}

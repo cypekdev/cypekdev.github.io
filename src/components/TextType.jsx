@@ -84,9 +84,28 @@ export default function TextType({
     const currentText = textArray[currentTextIndex];
     const processedText = reverseMode ? currentText.split('').reverse().join('') : currentText;
 
+    const getNextProcessedText = () => {
+      if (currentTextIndex === textArray.length - 1 && !loop) return '';
+      const nextText = textArray[(currentTextIndex + 1) % textArray.length];
+      return reverseMode ? nextText.split('').reverse().join('') : nextText;
+    };
+
+    const longestCommonPrefix = (a, b) => {
+      const minLen = Math.min(a.length, b.length);
+      let i = 0;
+      for (; i < minLen; i++) {
+        if (a[i] !== b[i]) break;
+      }
+      return a.slice(0, i);
+    };
+
+    const nextProcessedText = getNextProcessedText();
+    const targetPrefix = nextProcessedText === '' ? '' : longestCommonPrefix(processedText, nextProcessedText);
+
     const executeTypingAnimation = () => {
       if (isDeleting) {
-        if (displayedText === '') {
+        // stop deleting when we've reached the common prefix with the next sentence
+        if (displayedText === targetPrefix) {
           setIsDeleting(false);
           if (currentTextIndex === textArray.length - 1 && !loop) {
             return;
@@ -97,7 +116,7 @@ export default function TextType({
           }
 
           setCurrentTextIndex(prev => (prev + 1) % textArray.length);
-          setCurrentCharIndex(0);
+          setCurrentCharIndex(targetPrefix.length);
           timeout = setTimeout(() => {}, pauseDuration);
         } else {
           timeout = setTimeout(() => {
