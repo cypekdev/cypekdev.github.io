@@ -1,7 +1,7 @@
 .logo {
   position: relative;
   margin-inline: auto;
-  margin-top: 60px;
+  margin-bottom: 10px;
   width: min-content;
   user-select: none;
 }
@@ -19,6 +19,10 @@ pre {
   position: absolute;
   top: 0;
   padding: 0;
+  margin: 0;
+}
+
+.clear {
   margin: 0;
 }
 

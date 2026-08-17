@@ -7,46 +7,33 @@ import Contact from "./pages/Contact"
 import DarkVeil from "./DarkVeil"
 import gsap from "gsap"
 import { useRef, useEffect } from "react"
-import ReactLenis from "lenis/react"
+import PageTransition from "./components/PageTransition"
+import { ScrollProvider } from "./providers/ScrollProvider"
+import { ReactLenis } from "lenis/react";
+
 
 export default function App() {
 
-  const lenisRef = useRef()
-  
-  useEffect(() => {
-    function update(time) {
-      lenisRef.current?.lenis?.raf(time * 1000)
-    }
-  
-    gsap.ticker.add(update)
-  
-    return () => gsap.ticker.remove(update)
-  }, [])
-
   return (
     <>
-      <ReactLenis root options={{ autoRaf: false }} ref={lenisRef} />
-      <Router>
-        <div style={{ width: '100%', minHeight: '100vh', position: 'absolute' }}>
-          <div style={{ 
-            position: "absolute",  
-            width: "100%", 
-            height: "100%", 
-            overflow: "hidden",
-            zIndex: -1}}>      
+      <ScrollProvider>
+        <Router>
+
+
+          <div className="background-wrapper">      
             <DarkVeil hueShift={14} opacity={.5}/>
           </div>
           
           <Navigation/>
 
-          <Routes>
+          <PageTransition>
             <Route path="/" element={<Home />} />
             <Route path="/projects" element={<Projects />} />
             <Route path="/about" element={<About />} />
             <Route path="/contact" element={<Contact />} />
-          </Routes>
-        </div>
-      </Router>
+          </PageTransition>
+        </Router>
+      </ScrollProvider>
     </>
   )
 }

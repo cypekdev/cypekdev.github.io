@@ -24,10 +24,10 @@ function Header() {
         trigger: document.body,
         start: "top top",
         end: "+=1000",
-        scrub: true,
+        scrub: .4,
         // markers: true
       },
-      ease: "none"
+      ease: "none",
     });
 
   }, { scope: headerRef });

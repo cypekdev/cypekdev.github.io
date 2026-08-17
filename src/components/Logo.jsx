@@ -129,7 +129,7 @@ export function LogoElement() {
 
   return (<div className='logo'>
     <pre className='blur'>{ content }</pre>
-    <pre>{ content }</pre>
+    <pre className='clear'>{ content }</pre>
   </div>)
 }
   
