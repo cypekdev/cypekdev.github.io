@@ -156,18 +156,6 @@ export default function Scrollbar() {
       handleRefresh
     );
 
-    /*
-     * Zmiany wysokości DOM.
-     */
-    const resizeObserver =
-      new ResizeObserver(() => {
-        updateDimensions();
-      });
-
-    resizeObserver.observe(
-      document.body
-    );
-
     return () => {
       unsubscribe();
 
@@ -175,8 +163,6 @@ export default function Scrollbar() {
         "scroll:refresh",
         handleRefresh
       );
-
-      resizeObserver.disconnect();
 
       draggableRef.current?.kill();
       draggableRef.current = null;

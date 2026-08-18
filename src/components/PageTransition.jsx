@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState, useMemo, Children, isValidElement } from "react";
 import { useLocation, Routes } from "react-router";
 import { gsap } from "gsap";
 import { CustomEase } from "gsap/CustomEase";
@@ -8,11 +8,31 @@ import useScroll from "../hooks/useScroll";
 
 gsap.registerPlugin(CustomEase, CustomBounce);
 
+
+function getRouteIndex(routeOrder, pathname) {
+
+  console.log("getRouteIndex", routeOrder, pathname);
+
+  const index = routeOrder.indexOf(pathname);
+  // Nieznana trasa (np. 404, trasa z parametrem) traktowana jako
+  // "na końcu" - wchodzi zawsze z prawej, nie blokuje animacji.
+  return index === -1 ? routeOrder.length : index;
+}
+
 export default function PageTransition({ children }) {
   const location = useLocation();
 
   const [displayedLocation, setDisplayedLocation] =
     useState(location);
+
+
+  const routeOrder = useMemo(
+    () => Children.toArray(children)
+      .filter(isValidElement)
+      .map((child) => child.props.path)
+      .filter(Boolean),
+    [children]
+  );
 
   const {
     scrollTo,
@@ -69,6 +89,11 @@ export default function PageTransition({ children }) {
         location.pathname
       ];
 
+
+    const fromIndex = getRouteIndex(routeOrder, displayedLocation.pathname);
+    const toIndex = getRouteIndex(routeOrder, location.pathname);
+    const direction = toIndex >= fromIndex ? 1 : -1;
+
     /*
      * Tutaj potrzebujemy aktualnej pozycji scrolla.
      * Dlatego do API useScroll dodajemy getPosition().
@@ -90,7 +115,7 @@ export default function PageTransition({ children }) {
 
       // 2. Wchodząca strona startuje w pozycji "z prawej, niewidoczna"
       if (incomingEl) {
-        gsap.set(incomingEl, {xPercent: 100, opacity: 0})
+        gsap.set(incomingEl, {xPercent: 100 * direction})
       }
 
       // 3. Lenis przewija się na górę NATYCHMIAST (bez animacji
@@ -105,7 +130,7 @@ export default function PageTransition({ children }) {
       //    obie transformacje współistnieją bez konfliktu.
       const tl = gsap.timeline({
         defaults: {
-          duration: .5,
+          duration: .4,
           ease: CustomEase.create(
             "custom",
             "M0,0 C0,0 0.2,1.03 0.5,1.03 0.6,1.03 0.65,0.99 0.75,0.99 0.85,0.99 0.9,1 1,1",
@@ -120,10 +145,10 @@ export default function PageTransition({ children }) {
         },
       })
       if (outgoingEl) {
-        tl.to(outgoingEl, {xPercent: -100, opacity: 0}, 0)
+        tl.to(outgoingEl, {xPercent: -100 * direction}, 0)
       }
       if (incomingEl) {
-        tl.to(incomingEl, {xPercent: 0, opacity: 1}, 0)
+        tl.to(incomingEl, {xPercent: 0}, 0)
       }
     }, containerRef)
 

@@ -79,14 +79,12 @@ export default function Home() {
             "> enjoyer of not only software engineering",
             "> enjoyer of creation",
             "> enjoyer of technology",
-            "> previously a LEGO lover",
+            "> LEGO lover",
             "> developer of zs10.zabrze.pl school website",
             "> developer of arduino/raspberry projects",
             "> early IoT developer",
             "> 3D project designer",
             "> short film editor",
-            "> singer in the choir", 
-            "> singer in the school band",
             "> enjoyer of monospace font"
           ]}
           variableSpeed={{ min: 50, max: 100 }}

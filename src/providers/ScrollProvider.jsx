@@ -70,6 +70,16 @@ function ScrollController({ children }) {
     );
   }, [lenis]);
 
+  useEffect(() => {
+    const observer = new ResizeObserver(() => {
+      refresh();
+    });
+
+    observer.observe(document.documentElement);
+
+    return () => observer.disconnect();
+  }, [refresh]);
+
   const value = useMemo(
     () => ({
       scrollTo,

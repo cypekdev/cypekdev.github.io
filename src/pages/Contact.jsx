@@ -14,7 +14,6 @@ export default function Contact() {
     updatedProperty[name] = value.length > 0;
 
     const updatedProperties = { ...enteredProperties, ...updatedProperty };
-    console.log(updatedProperties);
     setEnteredProperties(updatedProperties);
   }
 

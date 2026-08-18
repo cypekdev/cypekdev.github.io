@@ -4,7 +4,7 @@ import Home from "./pages/Home"
 import Projects from "./pages/Projects"
 import About from "./pages/About"
 import Contact from "./pages/Contact"
-import DarkVeil from "./DarkVeil"
+import DarkVeil from "./components/DarkVeil"
 import gsap from "gsap"
 import { useRef, useEffect } from "react"
 import PageTransition from "./components/PageTransition"
@@ -28,8 +28,8 @@ export default function App() {
 
           <PageTransition>
             <Route path="/" element={<Home />} />
-            <Route path="/projects" element={<Projects />} />
             <Route path="/about" element={<About />} />
+            <Route path="/projects" element={<Projects />} />
             <Route path="/contact" element={<Contact />} />
           </PageTransition>
         </Router>
