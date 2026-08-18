@@ -14,7 +14,6 @@ export default function ScrollReveal({
   baseOpacity = 0.1,
   baseRotation = 3,
   blurStrength = 4,
-  containerClassName = '',
   textClassName = '',
   rotationEnd = 'bottom bottom',
   wordAnimationEnd = 'bottom bottom'
@@ -88,8 +87,8 @@ export default function ScrollReveal({
   });
 
   return (
-    <h2 ref={containerRef} className={`scroll-reveal ${containerClassName}`}>
-      <p className={textClassName}>{splitText}</p>
-    </h2>
+    <p ref={containerRef} className={`scroll-reveal ${textClassName}`}>
+      {splitText}
+    </p>
   );
 }

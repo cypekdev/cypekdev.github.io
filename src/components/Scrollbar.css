@@ -1,0 +1,27 @@
+html, body {
+  scrollbar-width: none; /* Firefox */
+}
+html::-webkit-scrollbar {
+  display: none; /* Safari and Chrome */
+}
+
+.track-style {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: min(1vw, 12px); /* Szerokość paska przewijania */
+  height: 100vh;
+  background: linear-gradient(90deg, #0000, #0000006a); /* Delikatne, półprzezroczyste tło paska */
+  z-index: 99999; /* Bardzo wysoki z-index, aby zawsze był na wierzchu */
+  user-select: none;
+  box-sizing: border-box;
+}
+
+.thumb-style {
+  position: absolute;
+  top: 0;
+  width: 70%;
+  background-color: #3339; /* Kolor suwaka (jak w systemowym) */
+  border-radius: 6px;
+  cursor: grab;
+}

@@ -14,7 +14,6 @@ export default function Contact() {
     updatedProperty[name] = value.length > 0;
 
     const updatedProperties = { ...enteredProperties, ...updatedProperty };
-    console.log(updatedProperties);
     setEnteredProperties(updatedProperties);
   }
 
@@ -32,7 +31,7 @@ export default function Contact() {
         <div className="input-group">
           <input 
             onChangeCapture={handleChange}
-            className={enteredProperties.name && "text-entered"}
+            className={enteredProperties.name ? "text-entered" : undefined}
             type="text" 
             autoComplete="additional-name" 
             id="name" 
@@ -51,7 +50,7 @@ export default function Contact() {
         <div className="input-group">
           <input 
             onChangeCapture={handleChange}
-            className={enteredProperties.email && "text-entered"}
+            className={enteredProperties.email ? "text-entered" : undefined}
             type="email" 
             autoComplete="email" 
             id="email" 
@@ -69,7 +68,7 @@ export default function Contact() {
 
         <div className="input-group">
           <textarea 
-            className={enteredProperties.message && "text-entered"}
+            className={enteredProperties.message ? "text-entered" : undefined}
             onChangeCapture={handleChange}
             id="message"
             name="message" 
