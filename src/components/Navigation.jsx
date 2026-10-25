@@ -14,11 +14,18 @@ gsap.registerPlugin(ScrollTrigger);
 function Header() {
   const headerRef = useRef(null);
 
+  function handleRefresh() {
+    const trigger = ScrollTrigger.getAll()[0];
+    trigger.animation.progress(trigger.progress).render(trigger.animation.time(), true, false);
+  }
+
   useGSAP(() => {
     const header = headerRef.current;
     if (!header) return;
 
-    gsap.to(header, {
+    const tween = gsap.fromTo(header, {
+      maxWidth: "1000px",
+    }, {
       maxWidth: "500px",
       scrollTrigger: {
         trigger: document.body,
@@ -29,6 +36,13 @@ function Header() {
       },
       ease: "none",
     });
+
+
+    addEventListener("scroll:refresh", handleRefresh)
+
+    return (() => {
+      removeEventListener("scroll:refresh", handleRefresh)
+    })
 
   }, { scope: headerRef });
 
