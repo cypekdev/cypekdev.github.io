@@ -18,7 +18,7 @@ function Card({ Svg, top, bottom, left, right }) {
 export default function IntroductionImage() {
   return (
     <div className="images">
-      <img src={image} alt="Cyprian Moj zdjęcie" className="main-picture" />
+      <img src={image} alt="Cyprian Moj photo" className="main-picture" />
       <Card Svg={TerminalSvg} top={"-15%"} left={"-25%"}></Card>
       <Card Svg={LightbulbSvg} top={"-10%"} right={"-22%"}></Card>
       <Card Svg={MusicSvg} bottom={"35%"} right={"-33%"}></Card>

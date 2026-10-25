@@ -1,38 +1,38 @@
-import { useLayoutEffect, useRef, useState, useMemo, Children, isValidElement } from "react";
+import { useLayoutEffect, useRef, useState, useMemo, Children, Fragment, isValidElement } from "react";
 import { useLocation, Routes } from "react-router";
 import { gsap } from "gsap";
 import { CustomEase } from "gsap/CustomEase";
 import { CustomBounce } from "gsap/CustomBounce";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 import useScroll from "../hooks/useScroll";
 
-gsap.registerPlugin(CustomEase, CustomBounce);
+gsap.registerPlugin(CustomEase, CustomBounce, ScrollTrigger);
 
 
 function getRouteIndex(routeOrder, pathname) {
-
-  console.log("getRouteIndex", routeOrder, pathname);
-
   const index = routeOrder.indexOf(pathname);
   // Nieznana trasa (np. 404, trasa z parametrem) traktowana jako
   // "na końcu" - wchodzi zawsze z prawej, nie blokuje animacji.
   return index === -1 ? routeOrder.length : index;
 }
 
-export default function PageTransition({ children }) {
+function getRoutePaths(children) {
+  return Children.toArray(children).flatMap((child) => {
+    if (!isValidElement(child)) return [];
+    if (child.type === Fragment) return getRoutePaths(child.props.children);
+    return child.props.path ? [child.props.path] : [];
+  });
+}
+
+export default function PageTransition({ children, backgroundRef }) {
   const location = useLocation();
 
   const [displayedLocation, setDisplayedLocation] =
     useState(location);
 
 
-  const routeOrder = useMemo(
-    () => Children.toArray(children)
-      .filter(isValidElement)
-      .map((child) => child.props.path)
-      .filter(Boolean),
-    [children]
-  );
+  const routeOrder = useMemo(() => getRoutePaths(children), [children]);
 
   const {
     scrollTo,
@@ -46,6 +46,13 @@ export default function PageTransition({ children }) {
 
   const isTransitioning =
     location.pathname !== displayedLocation.pathname;
+
+  useLayoutEffect(() => {
+    if (isTransitioning) return;
+
+    ScrollTrigger.refresh();
+    refresh();
+  }, [isTransitioning, refresh]);
 
   const layers = isTransitioning
     ? [
@@ -84,6 +91,13 @@ export default function PageTransition({ children }) {
         displayedLocation.pathname
       ];
 
+    const backgroundEl = backgroundRef?.current;
+    const backgroundY = backgroundEl
+      ? Number(gsap.getProperty(backgroundEl, "y")) || 0
+      : 0;
+
+    if (backgroundEl) gsap.killTweensOf(backgroundEl);
+
     const incomingEl =
       layerRefs.current[
         location.pathname
@@ -95,9 +109,22 @@ export default function PageTransition({ children }) {
     const direction = toIndex >= fromIndex ? 1 : -1;
 
     /*
-     * Tutaj potrzebujemy aktualnej pozycji scrolla.
-     * Dlatego do API useScroll dodajemy getPosition().
+     * Pobieramy aktualną pozycję scrolla przez getScroll().
      */
+    const outgoingTriggers = outgoingEl
+      ? ScrollTrigger.getAll().filter((triggerInstance) => {
+          const animationTargets = triggerInstance.animation?.targets?.() ?? [];
+          const triggerElement = triggerInstance.trigger;
+          const triggerBelongsToOutgoing =
+            triggerElement instanceof Element && outgoingEl.contains(triggerElement);
+          const animationBelongsToOutgoing = animationTargets.some(
+            (target) => target instanceof Element && outgoingEl.contains(target)
+          );
+
+          return triggerBelongsToOutgoing || animationBelongsToOutgoing;
+        })
+      : [];
+
     const ctx = gsap.context(() => {
       // 1. Zamrażamy wychodzącą stronę DOKŁADNIE w miejscu, gdzie
       //    była. position: fixed ustawiamy bezpośrednio przez DOM
@@ -118,6 +145,10 @@ export default function PageTransition({ children }) {
         gsap.set(incomingEl, {xPercent: 100 * direction})
       }
 
+      outgoingTriggers.forEach((triggerInstance) => {
+        triggerInstance.disable(false, true);
+      });
+
       // 3. Lenis przewija się na górę NATYCHMIAST (bez animacji
       //    scrolla - to nie ma być "smooth scroll to top", tylko
       //    twardy reset dla nowej strony w normalnym flow).
@@ -130,7 +161,7 @@ export default function PageTransition({ children }) {
       //    obie transformacje współistnieją bez konfliktu.
       const tl = gsap.timeline({
         defaults: {
-          duration: .4,
+          duration: 0.4,
           ease: CustomEase.create(
             "custom",
             "M0,0 C0,0 0.2,1.03 0.5,1.03 0.6,1.03 0.65,0.99 0.75,0.99 0.85,0.99 0.9,1 1,1",
@@ -140,8 +171,9 @@ export default function PageTransition({ children }) {
           setDisplayedLocation(location)
           delete layerRefs.current[displayedLocation.pathname]
         },
-        onStart: () => {
+        onStart: () => {  
           refresh()
+          
         },
       })
       if (outgoingEl) {
@@ -152,8 +184,27 @@ export default function PageTransition({ children }) {
       }
     }, containerRef)
 
-    return () => ctx.revert();
-  }, [location.pathname]);
+    if (backgroundEl && (scrollY !== 0 || backgroundY !== 0)) {
+      gsap.set(backgroundEl, {y: backgroundY - scrollY});
+      gsap.to(backgroundEl, {
+        y: 0,
+        duration: 1,
+        ease: CustomEase.create("custom", "M0,0 C0,0.5 0,0.8 0.1,0.9 0.2,1 0.5,1 1,1 "),
+        overwrite: true,
+      });
+    }
+
+    return () => {
+      ctx.revert();
+
+      const activeTriggers = new Set(ScrollTrigger.getAll());
+      outgoingTriggers.forEach((triggerInstance) => {
+        if (activeTriggers.has(triggerInstance)) {
+          triggerInstance.enable(false, false);
+        }
+      });
+    };
+  }, [backgroundRef, displayedLocation.pathname, getScroll, location, refresh, routeOrder, scrollTo]);
 
   return (
     <div

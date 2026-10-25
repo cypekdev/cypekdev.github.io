@@ -5,14 +5,13 @@ import Projects from "./pages/Projects"
 import About from "./pages/About"
 import Contact from "./pages/Contact"
 import DarkVeil from "./components/DarkVeil"
-import gsap from "gsap"
-import { useRef, useEffect } from "react"
+import { useRef } from "react"
 import PageTransition from "./components/PageTransition"
 import { ScrollProvider } from "./providers/ScrollProvider"
-import { ReactLenis } from "lenis/react";
 
 
 export default function App() {
+  const backgroundRef = useRef(null);
 
   return (
     <>
@@ -20,13 +19,13 @@ export default function App() {
         <Router>
 
 
-          <div className="background-wrapper">      
+          <div ref={backgroundRef} className="background-wrapper">      
             <DarkVeil hueShift={14} opacity={.5}/>
           </div>
           
           <Navigation/>
 
-          <PageTransition>
+          <PageTransition backgroundRef={backgroundRef}>
             <Route path="/" element={<Home />} />
             <Route path="/about" element={<About />} />
             <Route path="/projects" element={<Projects />} />
