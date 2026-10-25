@@ -153,6 +153,8 @@ export default function PageTransition({ children, backgroundRef }) {
       //    scrolla - to nie ma być "smooth scroll to top", tylko
       //    twardy reset dla nowej strony w normalnym flow).
       scrollTo(0, {immediate: true})
+      refresh()
+      ScrollTrigger.refresh()
 
       // 4. Właściwa animacja slide.
       //    Uwaga: outgoingEl ma już transform (y: -scrollY) z
@@ -161,7 +163,7 @@ export default function PageTransition({ children, backgroundRef }) {
       //    obie transformacje współistnieją bez konfliktu.
       const tl = gsap.timeline({
         defaults: {
-          duration: 0.4,
+          duration: .4,
           ease: CustomEase.create(
             "custom",
             "M0,0 C0,0 0.2,1.03 0.5,1.03 0.6,1.03 0.65,0.99 0.75,0.99 0.85,0.99 0.9,1 1,1",
@@ -170,10 +172,6 @@ export default function PageTransition({ children, backgroundRef }) {
         onComplete: () => {
           setDisplayedLocation(location)
           delete layerRefs.current[displayedLocation.pathname]
-        },
-        onStart: () => {  
-          refresh()
-          
         },
       })
       if (outgoingEl) {
